@@ -1,0 +1,58 @@
+@scripts = {
+<script type="text/javascript">
+        $(function() {
+            var urlRoot = 'http://www.mrb.com/';
+            var identifier = $('#identifier');
+            var roomName = $('#roomName');
+            var rooms = $('#roomList');
+            $('#myForm').submit(function(e) {
+                e.preventDefault();
+                if (roomName.val() !== '') {
+                    var deleteButton = $('<i>').addClass('icon-remove');
+                    rooms.append($('<li>').append( deleteButton).append('&nbsp;' + roomName.val()));
+                    roomName.val('');
+                }
+            });
+            $('#url').text(urlRoot);
+                identifier.keyup(function() {
+                $('#url').text('http://www.mrb.com/' + identifier.val());
+            });
+    })
+
+</script>
+}
+
+@main("Quick setup", scripts) {
+
+
+<div class="row">
+    <div class="span6">
+        <form id="myForm">
+
+            <span class="help-block">
+                    Please enter an identifier for your organisation of team. This will be used to generate the unique link
+                    for your meeting room booking system. For example, entering "myco" would give you a link of http://www.mrb.com/myco
+            </span>
+
+            <div class="input-append">
+                <input id="identifier" type="text" placeholder="identifier...">
+                <span id="url" class="add-on">.00</span>
+            </div>
+
+            <span class="help-block">
+                    Please enter the names of your meeting rooms.
+            </span>
+
+            <ul class="unstyled" id="roomList">
+
+            </ul>
+
+            <input id="roomName" type="text" placeholder="room name...">
+
+
+            <p> <button type="submit" class="btn"> Add </button> </p>
+
+        </form>
+    </div>
+</div>
+}
