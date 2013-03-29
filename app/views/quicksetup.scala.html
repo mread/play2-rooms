@@ -1,22 +1,46 @@
 @scripts = {
 <script type="text/javascript">
-        $(function() {
-            var urlRoot = 'http://www.mrb.com/';
-            var identifier = $('#identifier');
-            var roomName = $('#roomName');
-            var rooms = $('#roomList');
-            $('#myForm').submit(function(e) {
+    $(function () {
+        var urlRoot = 'http://www.somedomain.com/';
+        var identifier = $('#identifier');
+        var roomName = $('#roomName');
+        var roomsList = $('#roomList');
+        var rooms = [];
+
+        function initialise() {
+            function addRoom() {
+                var deleteButton = $('<i>').addClass('icon-remove');
+                roomsList.append($('<li>').append(deleteButton).append('&nbsp;' + roomName.val()));
+                rooms.push(roomName.val());
+            }
+
+            $('#add').click(function (e) {
                 e.preventDefault();
                 if (roomName.val() !== '') {
-                    var deleteButton = $('<i>').addClass('icon-remove');
-                    rooms.append($('<li>').append( deleteButton).append('&nbsp;' + roomName.val()));
+                    addRoom();
                     roomName.val('');
                 }
             });
-            $('#url').text(urlRoot);
-                identifier.keyup(function() {
-                $('#url').text('http://www.mrb.com/' + identifier.val());
+
+            $('#done').click(function(e) {
+                e.preventDefault();
+                $.ajax( { url: '/quicksetup/create',
+                          type: 'POST',
+                          data: JSON.stringify({ identifier: identifier.val(), rooms: rooms }),
+                          contentType: "application/json; charset=utf-8",
+                          dataType: 'JSON',
+                          success: function(data) {
+                            console.log(data);
+                          }});
             });
+
+            $('#url').text(urlRoot);
+            identifier.keyup(function () {
+                $('#url').text(urlRoot + identifier.val());
+            });
+        }
+
+        initialise();
     })
 
 </script>
@@ -50,7 +74,10 @@
             <input id="roomName" type="text" placeholder="room name...">
 
 
-            <p> <button type="submit" class="btn"> Add </button> </p>
+            <p>
+                <button id="add" class="btn"> Add</button>
+                <button id="done" class="btn btn-primary"> Done</button>
+            </p>
 
         </form>
     </div>
