@@ -5,6 +5,7 @@
         var identifier = $('#identifier');
         var roomName = $('#roomName');
         var roomsList = $('#roomList');
+        var flash = $('#flash');
         var rooms = [];
 
         function initialise() {
@@ -12,6 +13,17 @@
                 var deleteButton = $('<i>').addClass('icon-remove');
                 roomsList.append($('<li>').append(deleteButton).append('&nbsp;' + roomName.val()));
                 rooms.push(roomName.val());
+            }
+
+            function flashError(msg) {
+                flash.addClass('in');
+                flash.text(msg);
+            }
+
+            function flashHide() {
+                flash.removeClass('in');
+                flash.addClass('out');
+                flash.text("");
             }
 
             $('#add').click(function (e) {
@@ -31,31 +43,44 @@
                           dataType: 'JSON',
                           success: function(data) {
                             console.log(data);
+                          },
+                          error: function(jqXHR) {
+                            switch (jqXHR.status) {
+                                case 409:
+                                    flashError(jqXHR.responseText);
+                                    break;
+                                case 200:
+                                    flashError("Expected JSON in response, got 200 but not JSON");
+                                    break;
+                                default:
+                                    flashError(jqXHR.status + ', ' + jqXHR.responseText)
+                            }
                           }});
             });
 
             $('#url').text(urlRoot);
             identifier.keyup(function () {
+                flashHide();
                 $('#url').text(urlRoot + identifier.val());
             });
         }
 
         initialise();
-    })
+    });
 
 </script>
 }
 
 @main("Quick setup", scripts) {
 
-
 <div class="row">
+
     <div class="span6">
         <form id="myForm">
 
             <span class="help-block">
                     Please enter an identifier for your organisation of team. This will be used to generate the unique link
-                    for your meeting room booking system. For example, entering "myco" would give you a link of http://www.mrb.com/myco
+                    for your meeting room booking system.
             </span>
 
             <div class="input-append">
@@ -80,6 +105,9 @@
             </p>
 
         </form>
+
+        <div id="flash" class="alert alert-error fade"></div>
+
     </div>
 </div>
 }
