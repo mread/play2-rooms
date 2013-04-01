@@ -13,6 +13,7 @@ public class Configuration extends Model {
     public static Finder<String, Configuration> find = new Finder<String, Configuration>(
             String.class, Configuration.class
     );
+
     @Id
     private String identifier;
     @OneToMany(cascade = CascadeType.ALL)

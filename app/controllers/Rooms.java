@@ -3,8 +3,7 @@ package controllers;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.actor.UntypedActor;
-import models.Configuration;
-import org.codehaus.jackson.JsonNode;
+import models.Room;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import play.libs.Akka;
@@ -13,27 +12,20 @@ import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
-import views.html.quicksetup;
 
 import java.io.IOException;
+import java.util.List;
 
 import static akka.pattern.Patterns.ask;
 
-public class QuickSetup extends Controller {
+public class Rooms extends Controller {
 
     private static ActorRef myActor = Akka.system().actorOf(new Props(MyActor.class));
     private static ObjectMapper mapper = new ObjectMapper();
 
-    public static Result index() {
-        return ok(quicksetup.render());
-    }
-
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result create() throws IOException {
-        JsonNode json = request().body().asJson();
-        Configuration configuration = mapper.readValue(json, Configuration.class);
-
-        return async(Akka.asPromise(ask(myActor, configuration, 1000)).map(
+    public static Result list() throws IOException {
+        return async(Akka.asPromise(ask(myActor, "list the rooms", 1000)).map(
                 new F.Function<Object, Result>() {
                     public Result apply(Object response) {
                         return (Result) response;
@@ -45,15 +37,14 @@ public class QuickSetup extends Controller {
     private static class MyActor extends UntypedActor {
         @Override
         public void onReceive(Object message) throws Exception {
-            if (message instanceof Configuration) {
-                Configuration configuration = (Configuration) message;
-                if (configuration.find.byId(configuration.getIdentifier()) != null) {
-                    getSender().tell(status(409, "Identifier already exists"));
-                    return;
-                }
-                configuration.save();
+            if (message instanceof String) {
+
+                List<Room> rooms = Room.find.select("id, roomName")
+//                        .fetch("configuration")
+                        .findList();
                 ObjectNode result = Json.newObject();
-                result.put("message", "Saved");
+                result.put("Result", "OK");
+                result.put("Records", Json.toJson(rooms));
                 getSender().tell(ok(result), myActor);
             } else {
                 unhandled(message);
