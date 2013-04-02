@@ -1,5 +1,6 @@
 package models;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import play.db.ebean.Model;
 
 import javax.persistence.Entity;
@@ -15,8 +16,9 @@ public class Room extends Model {
     @Id
     private Long id;
     private String roomName;
-//    @ManyToOne
-//    private Configuration configuration;
+    @ManyToOne
+    @JsonIgnore
+    private Configuration configuration;
 
     public Room(String roomName) {
         this.roomName = roomName;
@@ -38,13 +40,13 @@ public class Room extends Model {
         this.roomName = roomName;
     }
 
-//    public Configuration getConfiguration() {
-//        return configuration;
-//    }
-//
-//    public void setConfiguration(Configuration configuration) {
-//        this.configuration = configuration;
-//    }
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
+    }
 
     @Override
     public String toString() {

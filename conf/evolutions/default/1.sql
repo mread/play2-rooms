@@ -10,8 +10,8 @@ create table configuration (
 
 create table room (
   id                        bigint not null,
-  configuration_identifier  varchar(255) not null,
   room_name                 varchar(255),
+  configuration_identifier  varchar(255),
   constraint pk_room primary key (id))
 ;
 
